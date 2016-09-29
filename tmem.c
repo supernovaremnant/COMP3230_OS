@@ -65,7 +65,9 @@ static void sig_chld(int dummy)
 	
 	(void) dummy;
 
+    //wait for child process state to change ...
 	pid = waitpid(-1, &status, WNOHANG);
+    //pid is the child process who terminate
     if (pid < 0)
     {
         fprintf(stderr, "waitpid failed\n");
@@ -74,9 +76,11 @@ static void sig_chld(int dummy)
 	
 	/* pid blocked */
     //signal comes from children
-	if(pid == block_pid)
-		return;
-	
+    if(pid == block_pid){
+        fprintf(stderr, "signal coming from created terminal\n");
+        return;
+    }
+		
 	/* signal not from children */
 	if (pid != target_pid ) 
 	//Task 2: Use the new terminal to send SIGCHLD to parent. Fill in before "return;"
@@ -85,8 +89,21 @@ static void sig_chld(int dummy)
 	//        3. Fork and exec the new application
 	//        4. Terminate original child
 	{
-
-
+        char new_program_to_run [PATH_MAX];
+        scanf("Received SIGCHILD not from target application \n Please input the path to the new target application : %s ", &new_program_to_run );
+        fprintf(stderr, "new program %s is going to be executed", new_program_to_run);
+        
+        //run new program
+        int new_created_status = execlp( &new_program_to_run, &new_program_to_run, NULL);
+        
+        if( new_created_status == -1 )
+        {
+            fprintf(stderr, "fail to create new program \n");
+        }
+        
+        //terminate old program
+        int kill_status = kill(target_pid, SIGTERM);
+        
 		return;
 	}
 	
@@ -236,6 +253,7 @@ int main(int argc, char **argv)
         return 1;
     }
 	
+    //target pid is the monitor pid
 	snprintf(filename, PATH_MAX, "/proc/%d/status", target_pid);
 	
 	/* Continual scan of proc */

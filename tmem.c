@@ -73,6 +73,7 @@ static void sig_chld(int dummy)
     }
 	
 	/* pid blocked */
+    //signal comes from children
 	if(pid == block_pid)
 		return;
 	
@@ -192,18 +193,20 @@ int main(int argc, char **argv)
     if( block_pid == 0)
     {
         //child process
-        printf("this is child process PID : %d \n ", getpid() );
-        printf("going to execute terminal process \n");
+        fprintf(stderr, "this is child process PID : %d \n ", getpid() );
+        fprintf(stderr, "going to execute terminal process \n");
         execlp("/usr/bin/xfce4-terminal", "/usr/bin/xfce4-terminal", NULL);
         //process table over write here
         //anything added here won't be executed
         
     }else if ( block_pid < 0)
     {
-        printf("fail to create child process \n");
+        fprintf(stderr, "fail to create child process \n");
     }
     else{
-        printf("this is the main process PID : %d \n", getpid() );
+        //main process
+        fprintf(stderr, "this is the main process PID : %d \n", getpid() );
+        fprintf(stderr, "New terminal spawned. Please send the signal to pid %d. ", block_pid );
     }
     
 	/* null_data is modified */
@@ -217,6 +220,8 @@ int main(int argc, char **argv)
 	
 	if (!target_pid) return child(argc, argv); //run child process
 
+    //main process continue ...
+    
 	//Set the signal handler function as sig_chld
 	act.sa_handler = sig_chld;
 

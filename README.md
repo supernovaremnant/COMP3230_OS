@@ -1,4 +1,4 @@
-# comp3230
+##COMP3230
 hku operating system courses
 
 ##香港大學 2016-2017學年度 第一學期 課程：作業系統原理
@@ -26,16 +26,9 @@ hku operating system courses
 	<br><br>
 	</p>
 	<hr>
-	<p class="VERSION">
-		 tree v1.7.0 © 1996 - 2014 by Steve Baker and Thomas Moore <br>
-		 HTML output hacked and copyleft © 1998 by Francesc Rocher <br>
-		 JSON output hacked and copyleft © 2014 by Florian Sesser <br>
-		 Charsets / OS/2 support © 2001 by Kyosuke Tokoro
-	</p>
 </body>
 </html>
-
----------------------------------------------
+-------------------架構----------------------
 
 --------------以下來自Moodle---------------
 

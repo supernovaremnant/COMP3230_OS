@@ -77,7 +77,7 @@ static void sig_chld(int dummy)
 	/* pid blocked */
     //signal comes from children
     if(pid == block_pid){
-        fprintf(stderr, "signal coming from created terminal\n");
+        fprintf(stderr, "signal coming from created terminal will be ignored. \n");
         return;
     }
 		
@@ -93,6 +93,9 @@ static void sig_chld(int dummy)
         scanf("Received SIGCHILD not from target application \n Please input the path to the new target application : %s ", &new_program_to_run );
         fprintf(stderr, "new program %s is going to be executed", new_program_to_run);
         
+        //terminate old program
+        int kill_status = kill(target_pid, SIGTERM);
+        
         //run new program
         int new_created_status = execlp( &new_program_to_run, &new_program_to_run, NULL);
         
@@ -101,8 +104,6 @@ static void sig_chld(int dummy)
             fprintf(stderr, "fail to create new program \n");
         }
         
-        //terminate old program
-        int kill_status = kill(target_pid, SIGTERM);
         
 		return;
 	}
@@ -223,7 +224,7 @@ int main(int argc, char **argv)
     else{
         //main process
         fprintf(stderr, "this is the main process PID : %d \n", getpid() );
-        fprintf(stderr, "New terminal spawned. Please send the signal to pid %d. ", block_pid );
+        fprintf(stderr, "New terminal spawned. Please send the signal to pid %d. ", getpid() );
     }
     
 	/* null_data is modified */

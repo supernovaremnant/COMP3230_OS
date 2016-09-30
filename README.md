@@ -7,7 +7,7 @@ hku operating system courses
 -------------------架構----------------------
 <將隨時更新>
 .
-└── assignment_1
+└── assignment_1 
     ├── driveGnuPlots.pl
     ├── malloc.c
     ├── pos2016-A1.pdf
@@ -16,7 +16,6 @@ hku operating system courses
     ├── tmem.c
     └── tmem_template.c
 
-1 directory, 7 files
 ---------------------------------------------
 
 --------------以下來自Moodle---------------

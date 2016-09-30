@@ -73,57 +73,66 @@ static void sig_chld(int dummy)
         fprintf(stderr, "waitpid failed\n");
         return;
     }
-	
-	/* pid blocked */
+
+    /* pid blocked */
     //signal comes from children
     if(pid == block_pid){
-        fprintf(stderr, "signal coming from created terminal will be ignored. \n");
+	fprintf(stderr, "ignore signal\n");
         return;
     }
 		
 	/* signal not from children */
-	if (pid != target_pid ) 
-	//Task 2: Use the new terminal to send SIGCHLD to parent. Fill in before "return;"
-	//        1. Read and store the path to new program from the original terminal (assume no argument)
-	//	  	  2. The current target will be terminated, so block its pid
-	//        3. Fork and exec the new application
-	//        4. Terminate original child
+	if (pid != target_pid) 
+		//Task 2: Use the new terminal to send SIGCHLD to parent. Fill in before "return;"
+		//        1. Read and store the path to new program from the original terminal (assume no argument)
+		//	  2. The current target will be terminated, so block its pid
+		//        3. Fork and exec the new application
+		//        4. Terminate original child
 	{
-        char new_program_to_run [PATH_MAX];
-        scanf("Received SIGCHILD not from target application \n Please input the path to the new target application : %s ", &new_program_to_run );
-        fprintf(stderr, "new program %s is going to be executed", new_program_to_run);
-        
-        //terminate old program
-        int kill_status = kill(target_pid, SIGTERM);
-        
-        fprintf(stderr, "terminate child process ... %d", target_pid);
-        
-        int new_program_pid = fork();
-        
-        if (new_program_pid == 0)
-        {
-            //child process
-            int new_created_status = execlp( &new_program_to_run, &new_program_to_run, NULL);
-            
-            //process table will be over written after exec command
-            if( new_created_status == -1 )
-            {
-                fprintf(stderr, "fail to create new program \n");
-            }
-        }else if( new_program_pid < 0)
-        {
-            fprintf(stderr, "cannot start new program \n");
-        }
-        
-		return;
-	}
+		fprintf(stderr, "pid: %d state changed \n", pid);
+
+		char * new_program_to_run = (char * )(malloc(sizeof(char) * 100));
+		fprintf(stderr, "Received SIGCHLD not from target application\n Please input the path to the new target application.\n");
+
+		gets(new_program_to_run);        
+		fprintf(stderr, "new program %s is going to be executed\n ", new_program_to_run);
 	
+		//terminate old program
+		int kill_status = kill(target_pid, SIGTERM);
+	
+		fprintf(stderr, "terminate child process with pid: %d, kill status %d\n", target_pid, kill_status);	
+
+		block_pid = target_pid;
+		
+		target_pid = fork();
+	
+		if (target_pid == 0)
+		{
+		    //child process
+		    int new_created_status = execlp( new_program_to_run, NULL);
+		    
+		    //process table will be over written after exec command
+		    if( new_created_status == -1 )
+		    {
+			fprintf(stderr, "fail to create new program \n");
+		    }
+		}else if( target_pid < 0)
+		{
+		    fprintf(stderr, "cannot start new program \n");
+		}else{
+			fprintf(stderr, "start new program with pid %d.\n", target_pid);
+			//need to update the PID of new program
+			return;
+		}
+		
+	}
 
 	/* Get child status value */
-    if (WIFEXITED(status))
+    if (WIFEXITED(status))//true if process terminated normally
     {
         child_val = WEXITSTATUS(status);
-        exit(child_val);
+	fprintf(stderr, "child process termiated normally");
+	exit(child_val);
     }
 }
 
@@ -270,6 +279,7 @@ int main(int argc, char **argv)
 	/* Continual scan of proc */
 	while (1)
 	{
+		fprintf(stderr, "targeting process: %d, filename: %s ,main process pid %d\n", target_pid, filename, getpid());
 		main_loop(filename);
 		/* Wait for 0.1 sec */
 		usleep(100000);

@@ -96,14 +96,24 @@ static void sig_chld(int dummy)
         //terminate old program
         int kill_status = kill(target_pid, SIGTERM);
         
-        //run new program
-        int new_created_status = execlp( &new_program_to_run, &new_program_to_run, NULL);
+        fprintf(stderr, "terminate child process ... %d", target_pid);
         
-        if( new_created_status == -1 )
+        int new_program_pid = fork();
+        
+        if (new_program_pid == 0)
         {
-            fprintf(stderr, "fail to create new program \n");
+            //child process
+            int new_created_status = execlp( &new_program_to_run, &new_program_to_run, NULL);
+            
+            //process table will be over written after exec command
+            if( new_created_status == -1 )
+            {
+                fprintf(stderr, "fail to create new program \n");
+            }
+        }else if( new_program_pid < 0)
+        {
+            fprintf(stderr, "cannot start new program \n");
         }
-        
         
 		return;
 	}

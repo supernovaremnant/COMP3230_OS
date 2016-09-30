@@ -6,17 +6,35 @@ hku operating system courses
 
 -------------------架構----------------------
 <將隨時更新>
-.
-└── assignment_1</br>
-    ├── driveGnuPlots.pl</br>
-    ├── malloc.c</br>
-    ├── pos2016-A1.pdf</br>
-    ├── pos2016-workshop2(updated Sept 21).pdf</br>
-    ├── run.sh</br>
-    ├── tmem.c</br>
-    └── tmem_template.c</br>
+<html>
+<body>
+	<h1>Directory Tree</h1><p>
+	<a href="baseHREF">baseHREF</a><br>
+	└── <a href="baseHREF/assignment_1/">assignment_1</a><br>
+	&nbsp;&nbsp;&nbsp; ├── <a href="baseHREF/assignment_1/driveGnuPlots.pl">driveGnuPlots.pl</a><br>
+	&nbsp;&nbsp;&nbsp; ├── <a href="baseHREF/assignment_1/malloc.c">malloc.c</a><br>
+	&nbsp;&nbsp;&nbsp; ├── <a href="baseHREF/assignment_1/pos2016-A1.pdf">pos2016-A1.pdf</a><br>
+	&nbsp;&nbsp;&nbsp; ├── <a href="baseHREF/assignment_1/pos2016-workshop2(updated%20Sept%2021).pdf">pos2016-workshop2(updated Sept 21).pdf</a><br>
+	&nbsp;&nbsp;&nbsp; ├── <a href="baseHREF/assignment_1/run.sh">run.sh</a><br>
+	&nbsp;&nbsp;&nbsp; ├── <a href="baseHREF/assignment_1/tmem.c">tmem.c</a><br>
+	&nbsp;&nbsp;&nbsp; └── <a href="baseHREF/assignment_1/tmem_template.c">tmem_template.c</a><br>
+	<br><br>
+	</p>
+	<p>
 
 1 directory, 7 files
+	<br><br>
+	</p>
+	<hr>
+	<p class="VERSION">
+		 tree v1.7.0 © 1996 - 2014 by Steve Baker and Thomas Moore <br>
+		 HTML output hacked and copyleft © 1998 by Francesc Rocher <br>
+		 JSON output hacked and copyleft © 2014 by Florian Sesser <br>
+		 Charsets / OS/2 support © 2001 by Kyosuke Tokoro
+	</p>
+</body>
+</html>
+
 ---------------------------------------------
 
 --------------以下來自Moodle---------------

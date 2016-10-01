@@ -243,7 +243,7 @@ int main(int argc, char **argv)
     else{
         //main process
         //fprintf(stderr, "this is the main process PID : %d \n", getpid() );
-        fprintf(stderr, "New terminal spawned. Please send the signal to pid %d. ", getpid() );
+        fprintf(stderr, "New terminal spawned. Please send the signal to pid %d \n", getpid() );
     }
     
 	/* null_data is modified */

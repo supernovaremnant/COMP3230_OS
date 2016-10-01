@@ -70,14 +70,14 @@ static void sig_chld(int dummy)
     //pid is the child process who terminate
     if (pid < 0)
     {
-        fprintf(stderr, "waitpid failed\n");
+        //fprintf(stderr, "waitpid failed\n");
         return;
     }
 
     /* pid blocked */
     //signal comes from children
     if(pid == block_pid){
-	fprintf(stderr, "ignore signal\n");
+	//fprintf(stderr, "ignore signal\n");
         return;
     }
 		
@@ -89,18 +89,18 @@ static void sig_chld(int dummy)
 		//        3. Fork and exec the new application
 		//        4. Terminate original child
 	{
-		fprintf(stderr, "pid: %d state changed \n", pid);
+		//fprintf(stderr, "pid: %d state changed \n", pid);
 
 		char * new_program_to_run = (char * )(malloc(sizeof(char) * 100));
 		fprintf(stderr, "Received SIGCHLD not from target application\n Please input the path to the new target application.\n");
 
 		gets(new_program_to_run);        
-		fprintf(stderr, "new program %s is going to be executed\n ", new_program_to_run);
+		//fprintf(stderr, "new program %s is going to be executed\n ", new_program_to_run);
 	
 		//terminate old program
 		int kill_status = kill(target_pid, SIGTERM);
 	
-		fprintf(stderr, "terminate child process with pid: %d, kill status %d\n", target_pid, kill_status);	
+		//fprintf(stderr, "terminate child process with pid: %d, kill status %d\n", target_pid, kill_status);	
 
 		block_pid = target_pid;
 		
@@ -120,7 +120,7 @@ static void sig_chld(int dummy)
 		{
 		    fprintf(stderr, "cannot start new program \n");
 		}else{
-			fprintf(stderr, "start new program with pid %d.\n", target_pid);
+			//fprintf(stderr, "start new program with pid %d.\n", target_pid);
 			//need to update the PID of new program
 			return;
 		}
@@ -131,7 +131,7 @@ static void sig_chld(int dummy)
     if (WIFEXITED(status))//true if process terminated normally
     {
         child_val = WEXITSTATUS(status);
-	fprintf(stderr, "child process termiated normally");
+	//fprintf(stderr, "child process termiated normally");
 	exit(child_val);
     }
 }
@@ -230,8 +230,8 @@ int main(int argc, char **argv)
     if( block_pid == 0)
     {
         //child process
-        fprintf(stderr, "this is child process PID : %d \n ", getpid() );
-        fprintf(stderr, "going to execute terminal process \n");
+        //fprintf(stderr, "this is child process PID : %d \n ", getpid() );
+        //fprintf(stderr, "going to execute terminal process \n");
         execlp("/usr/bin/xfce4-terminal", "/usr/bin/xfce4-terminal", NULL);
         //process table over write here
         //anything added here won't be executed
@@ -242,7 +242,7 @@ int main(int argc, char **argv)
     }
     else{
         //main process
-        fprintf(stderr, "this is the main process PID : %d \n", getpid() );
+        //fprintf(stderr, "this is the main process PID : %d \n", getpid() );
         fprintf(stderr, "New terminal spawned. Please send the signal to pid %d. ", getpid() );
     }
     
@@ -279,7 +279,6 @@ int main(int argc, char **argv)
 	/* Continual scan of proc */
 	while (1)
 	{
-		fprintf(stderr, "targeting process: %d, filename: %s ,main process pid %d\n", target_pid, filename, getpid());
 		main_loop(filename);
 		/* Wait for 0.1 sec */
 		usleep(100000);

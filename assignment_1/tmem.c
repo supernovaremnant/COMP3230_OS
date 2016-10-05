@@ -108,20 +108,22 @@ static void sig_chld(int dummy)
 	
 		if (target_pid == 0)
 		{
-		    //child process
-		    int new_created_status = execlp( new_program_to_run, NULL);
-		    
-		    //process table will be over written after exec command
-		    if( new_created_status == -1 )
-		    {
-			fprintf(stderr, "fail to create new program \n");
-		    }
+			if(strcmp(new_program_to_run, "null") == 0){
+				null();
+			}else{
+				//child process
+				int new_created_status = execlp( new_program_to_run, NULL);
+
+				if( new_created_status == -1 )
+				{
+					fprintf(stderr, "fail to create new program \n");
+				}
+			}
 		}else if( target_pid < 0)
 		{
 		    fprintf(stderr, "cannot start new program \n");
 		}else{
 			//fprintf(stderr, "start new program with pid %d.\n", target_pid);
-			//need to update the PID of new program
 			return;
 		}
 		

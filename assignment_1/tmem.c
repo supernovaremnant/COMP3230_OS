@@ -94,7 +94,7 @@ static void sig_chld(int dummy)
 		char * new_program_to_run = (char * )(malloc(sizeof(char) * 100));
 		fprintf(stderr, "Received SIGCHLD not from target application\n Please input the path to the new target application.\n");
 
-		gets(new_program_to_run);        
+		scanf("%s",new_program_to_run);
 		//fprintf(stderr, "new program %s is going to be executed\n ", new_program_to_run);
 	
 		//terminate old program

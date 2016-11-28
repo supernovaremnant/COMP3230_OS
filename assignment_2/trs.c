@@ -106,7 +106,7 @@ void init_rt(rt *t)  {
 
 	for (i = 0; i < ROW; i++)
 		for (j = 0; j < COL; j++)
-			t->table[i][j] = 0;
+			t->table[i][j] = -1;
 	for (i = 0; i < AGENT_NO; i++)
 		t->seats[i] = 0;
 

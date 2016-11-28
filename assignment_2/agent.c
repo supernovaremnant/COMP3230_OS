@@ -95,20 +95,13 @@ void *agent(void *data)  {
                         printf("cannot find ava seats, end\n");
                     return -1;
                 }else{
-                    printf("ready to write %d, %d, %d \n", available_row, available_col, request);
+                    printf("re row:%d, col:%d, req_num:%d, agent_id:%d, req_id:%d \n", available_row, available_col, request, id, i);
                     //writer begin
                     sem_wait(&writer_sem);
                     
                     //check again, reader begin
                     int available_row_2 = -1; int available_col_2 = -1; row_i = 0;
-                    
                     sem_wait( &reader_sem ); //lock reader
-                    t->reader_count += 1;
-                    if (t->reader_count == 1) {
-                        sem_wait(&writer_sem);
-                    }
-                    sem_post(&reader_sem);
-                    
                     do{
                         available_col_2 = row_check(row_i, request);
                         if( available_col_2 != -1 ){
@@ -116,13 +109,6 @@ void *agent(void *data)  {
                         }
                         row_i ++;
                     }while( row_i < ROW && available_col_2 == -1 );
-                    
-                    sem_wait(&reader_sem);
-                    t->reader_count -= 1 ;
-                    
-                    if (t->reader_count == 0) {
-                        sem_post(&writer_sem);
-                    }
                     sem_post(&reader_sem);
                     //reader end
                     
@@ -138,6 +124,7 @@ void *agent(void *data)  {
                         //seat still vacant
                         double_checked = 1;
                         //printf("matched\n");
+             		printf("wr row:%d, col:%d, req_num:%d, agent_id:%d, req_id:%d \n\n", available_row_2, available_col_2, request, id, i);
                         reserve( i, available_row, available_col, id);
                         sem_post(&writer_sem);
                         gettimeofday((t->end_time)+id, NULL);
@@ -166,7 +153,7 @@ int row_check(int row, int seats){
     int i;
 
     for(i=0; i<COL; i++){
-        if(t->table[row][i] == 0){
+        if(t->table[row][i] == -1){
             count++;
             if(count == seats)
                 return (i-seats+1);

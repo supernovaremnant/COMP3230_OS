@@ -205,5 +205,6 @@ int main(int argc, char **argv) {
        sec = (float)usec / (float)1000000;
 	   printf("Agent%d %d %.4f\n", i, t->seats[i], sec);
    }
+    print_table(t->table);
    return 0;
 }

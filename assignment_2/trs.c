@@ -106,7 +106,7 @@ void init_rt(rt *t)  {
 
 	for (i = 0; i < ROW; i++)
 		for (j = 0; j < COL; j++)
-			t->table[i][j] = -1;
+			t->table[i][j] = 0;
 	for (i = 0; i < AGENT_NO; i++)
 		t->seats[i] = 0;
 
@@ -205,6 +205,6 @@ int main(int argc, char **argv) {
        sec = (float)usec / (float)1000000;
 	   printf("Agent%d %d %.4f\n", i, t->seats[i], sec);
    }
-    print_table(t->table);
+   //print_table(t->table);
    return 0;
 }

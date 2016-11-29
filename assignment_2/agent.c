@@ -8,7 +8,7 @@
 #include <errno.h>
 #include "trs.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 extern int req[AGENT_NO][COL*ROW];
 extern int served_req[AGENT_NO][COL*ROW][3];		// served requests
@@ -46,6 +46,17 @@ void *agent(void *data)  {
             if (mode == 2)
             {
                 int row_withdraw = served_req[id][req[id][i]*-1][0];
+                int tmp = 0;
+                int ret = sem_getvalue(&writer_sem_arr[row_withdraw], &tmp);
+                if(tmp <= 0 && ret == 0)
+                {
+                    printf("writer busy sleep\n");
+                    usleep(1);
+                    //ret = sem_getvalue(&writer_sem_arr[row_withdraw], &tmp);    
+                }else{
+                    printf("got it\n");    
+                }
+                
                 sem_wait(&writer_sem_arr[row_withdraw]);
                 withdraw(i,id);
                 sem_post(&writer_sem_arr[row_withdraw]);
@@ -61,6 +72,7 @@ void *agent(void *data)  {
             {
                 printf("wit agent_id:%d, req_id:%d \n", id, i);
             }
+
         }
         else{
             // Reservation request
@@ -234,34 +246,67 @@ void best_fit( int seats, int * row, int * col ){
     int min_dis = COL+1;
     int dis;
     int count = 0;
-    
-    for (int i = 0; i < ROW; ++i)
+    int i = 0;
+
+    if (seats %2 == 0)
     {
-        for (int j = 0; j < COL; ++j)
+        for (i = 0; i < ROW; ++i)
         {
-            if (t->table[i][j] == 0)
+            for (int j = 0; j < COL; ++j)
             {
-                count ++;
-            }else{
-                dis = count - seats;
-                if (dis >= 0 && dis < min_dis)
+                if (t->table[i][j] == 0)
                 {
-                    min_dis = dis; 
-                    best_row = i;
-                    best_col = j - count;
+                    count ++;
+                }else{
+                    dis = count - seats;
+                    if (dis >= 0 && dis < min_dis)
+                    {
+                        min_dis = dis; 
+                        best_row = i;
+                        best_col = j - count;
+                    }
+                    count = 0;
                 }
-                count = 0;
             }
+            dis = count - seats;
+            if (dis >= 0 && dis < min_dis )
+            {
+                min_dis = dis;
+                best_row = i; 
+                best_col = COL - min_dis - seats;
+            }
+            count = 0;
         }
-        dis = count - seats;
-        if (dis >= 0 && dis < min_dis )
+    }else{
+        for (i = ROW - 1; i >= 0; --i)
         {
-            min_dis = dis;
-            best_row = i; 
-            best_col = COL - min_dis - seats;
+            for (int j = 0; j < COL; ++j)
+            {
+                if (t->table[i][j] == 0)
+                {
+                    count ++;
+                }else{
+                    dis = count - seats;
+                    if (dis >= 0 && dis < min_dis)
+                    {
+                        min_dis = dis; 
+                        best_row = i;
+                        best_col = j - count;
+                    }
+                    count = 0;
+                }
+            }
+            dis = count - seats;
+            if (dis >= 0 && dis < min_dis )
+            {
+                min_dis = dis;
+                best_row = i; 
+                best_col = COL - min_dis - seats;
+            }
+            count = 0;
         }
-        count = 0;
     }
+    
     if (best_row == -1 )
     {
         *row = -1; *col = -1;
@@ -288,52 +333,101 @@ void advance_fit( int seats, int * row, int * col ){
     int min_dis = COL+1;
     int dis;
     int count = 0;
-    
-    for (int i = 0; i < ROW; ++i)
-    {   
-        //unlock sem 
-        sem_wait(&reader_sem_arr[i]);
-        t->reader_counts[i] += 1;
-        if ( t->reader_counts[i] == 1)
-        {
-            sem_wait(&writer_sem_arr[i]);
-        }
-        sem_post(&reader_sem_arr[i]);
+    int i = 0;
 
-        for (int j = 0; j < COL; ++j)
-        {
-            if (t->table[i][j] == 0)
+    if (seats %2 == 0)
+    {
+        for (i = 0; i < ROW; ++i)
+        {   
+            //unlock sem 
+            sem_wait(&reader_sem_arr[i]);
+            t->reader_counts[i] += 1;
+            if ( t->reader_counts[i] == 1)
             {
-                count ++;
-            }else{
-                dis = count - seats;
-                if (dis >= 0 && dis < min_dis)
-                {
-                    min_dis = dis; 
-                    best_row = i;
-                    best_col = j - count;
-                }
-                count = 0;
+                sem_wait(&writer_sem_arr[i]);
             }
-        }
-        dis = count - seats;
-        if (dis >= 0 && dis < min_dis )
-        {
-            min_dis = dis;
-            best_row = i; 
-            best_col = COL - min_dis - seats;
-        }
-        count = 0;
+            sem_post(&reader_sem_arr[i]);
 
-        sem_wait(&reader_sem_arr[i]);
-        t->reader_counts[i]--;
-        if (t->reader_counts[i] == 0)
-        {
-            sem_post(&writer_sem_arr[i]);
+            for (int j = 0; j < COL; ++j)
+            {
+                if (t->table[i][j] == 0)
+                {
+                    count ++;
+                }else{
+                    dis = count - seats;
+                    if (dis >= 0 && dis < min_dis)
+                    {
+                        min_dis = dis; 
+                        best_row = i;
+                        best_col = j - count;
+                    }
+                    count = 0;
+                }
+            }
+            dis = count - seats;
+            if (dis >= 0 && dis < min_dis )
+            {
+                min_dis = dis;
+                best_row = i; 
+                best_col = COL - min_dis - seats;
+            }
+            count = 0;
+
+            sem_wait(&reader_sem_arr[i]);
+            t->reader_counts[i]--;
+            if (t->reader_counts[i] == 0)
+            {
+                sem_post(&writer_sem_arr[i]);
+            }
+            sem_post(&reader_sem_arr[i]);
         }
-        sem_post(&reader_sem_arr[i]);
+    }else{
+        for (i = ROW - 1; i >= 0 ; --i)
+        {   
+            //unlock sem 
+            sem_wait(&reader_sem_arr[i]);
+            t->reader_counts[i] += 1;
+            if ( t->reader_counts[i] == 1)
+            {
+                sem_wait(&writer_sem_arr[i]);
+            }
+            sem_post(&reader_sem_arr[i]);
+
+            for (int j = 0; j < COL; ++j)
+            {
+                if (t->table[i][j] == 0)
+                {
+                    count ++;
+                }else{
+                    dis = count - seats;
+                    if (dis >= 0 && dis < min_dis)
+                    {
+                        min_dis = dis; 
+                        best_row = i;
+                        best_col = j - count;
+                    }
+                    count = 0;
+                }
+            }
+            dis = count - seats;
+            if (dis >= 0 && dis < min_dis )
+            {
+                min_dis = dis;
+                best_row = i; 
+                best_col = COL - min_dis - seats;
+            }
+            count = 0;
+
+            sem_wait(&reader_sem_arr[i]);
+            t->reader_counts[i]--;
+            if (t->reader_counts[i] == 0)
+            {
+                sem_post(&writer_sem_arr[i]);
+            }
+            sem_post(&reader_sem_arr[i]);
+        }
     }
-
+    
     if (best_row == -1 )
     {
         *row = -1; *col = -1;

@@ -35,13 +35,13 @@ void *agent(void *data)  {
 
     gettimeofday( ( t->start_time ) + id, NULL );
 
-    int req_per_agent = 0;
+    int req_index = 0;
     int request; 
 
-    for( req_per_agent = 0; req_per_agent < COL*ROW; req_per_agent++ )
+    for( req_index = 0; req_index < COL*ROW; req_index++ )
     {
 
-        request = req[id][req_per_agent];
+        request = req[id][req_index];
 
         if( request <= 0 )
         {
@@ -49,21 +49,21 @@ void *agent(void *data)  {
             
             if ( mode == 2 )
             {
-                int row_withdraw = served_req[id][req[id][req_per_agent]*-1][0];
+                int row_withdraw = served_req[id][req[id][req_index]*-1][0];
                 if ( row_withdraw != -1 )
                 {
                 	sem_wait( &writer_sem_arr[row_withdraw] );
-	                withdraw( i, id);
+	                withdraw( req_index, id);
 	                sem_post( &writer_sem_arr[row_withdraw] );
                 }
             }else{
                 sem_wait( &writer_sem ); 
-                withdraw( i, id );
+                withdraw( req_index, id );
                 sem_post( &writer_sem );
             }
 
             if ( DEBUG )
-                printf( "withdraw agent_id:%d, req_id:%d \n", id, i );
+                printf( "withdraw agent_id:%d, req_id:%d \n", id, req_index );
             
         }
         else{
@@ -117,103 +117,90 @@ void *agent(void *data)  {
                     return -1;
                 }else{
                 	if( DEBUG )
-                        printf( "req row:%d, col:%d, req_num:%d, agent_id:%d, req_id:%d \n", available_row, available_col, request, id, i );
+                        printf( "req row:%d, col:%d, req_num:%d, agent_id:%d, req_id:%d \n", available_row, available_col, request, id, req_index );
                     
                     
-                    int available_row_2 = -1; int available_col_2 = -1; row_i = 0;
+                    int avai_row_check = -1; int avai_col_check = -1; row_i = 0;
                         
                     if ( mode == 2 )
                     {
-                        //writer begin
-                        sem_wait(&writer_sem_arr[available_row]);
+                        sem_wait( &writer_sem_arr[available_row] );
 
-                        //double check
-                        best_fit(request, &available_row_2, &available_col_2);
+                        best_fit( request, &avai_row_check, &avai_col_check );
                         
-                        //use reader data
-                        if( available_col_2 == -1 )
+                        if( avai_col_check == -1 )
                         {
-                            if(DEBUG)
-                                printf("cannot find more seats, end\n"); 
-                            sem_post(&writer_sem_arr[available_row]);
-                            gettimeofday((t->end_time)+id, NULL);
+                            if( DEBUG )
+                                printf( "cannot find more seats, end\n" );
+                            sem_post( &writer_sem_arr[available_row] );
+                            gettimeofday( ( t->end_time ) + id, NULL );
                             return -1;
                         }
 
-                        //double checking 
-                        if (available_row == available_row_2 && available_col == available_col_2) 
+                        if ( available_row == avai_row_check && available_col == avai_col_check )
                         {
-                            //seat still vacant 
                             double_checked = 1;
-                            if (DEBUG)
+                            if ( DEBUG )
                             {
-                                printf("wr row:%d, col:%d, req_num:%d, agent_id:%d, req_id:%d \n\n", available_row, available_col, request, id, i);
+                                printf( "wr row:%d, col:%d, req_num:%d, agent_id:%d, req_id:%d \n\n", available_row, available_col, request, id, req_index );
                                 
                             }
-                            reserve( i, available_row, available_col, id);
-                            //print_table(t->table);
-                            //writer end
+                            reserve( req_index, available_row, available_col, id );
+                            if( DEBUG )
+                                print_table(t->table);
                         }else{
                         	double_checked = 0;
                         }
-                        sem_post(&writer_sem_arr[available_row]);
+                        sem_post( &writer_sem_arr[available_row] );
 
                     }else{
-                        //writer begin
-                        sem_wait(&writer_sem);
+                        sem_wait( &writer_sem );
                         
-                        if (mode == 0)
+                        if ( mode == 0 )
                         {
-                            first_fit(request, &available_row_2, &available_col_2);
-                        }else if (mode == 1){
-                            best_fit(request, &available_row_2, &available_col_2);
+                            first_fit( request, &avai_row_check, &avai_col_check );
+                        }else if ( mode == 1 ){
+                            best_fit( request, &avai_row_check, &avai_col_check );
                         }
                         
-                        if( available_col_2 == -1 )
+                        if( avai_col_check == -1 )
                         {
-                            if(DEBUG)
-                                printf("cannot find more seats, end\n"); 
-                            sem_post(&writer_sem);
-                            gettimeofday((t->end_time)+id, NULL);
+                            if( DEBUG )
+                                printf( "cannot find more seats, end\n" );
+                            sem_post( &writer_sem );
+                            gettimeofday( ( t->end_time ) + id, NULL );
                             return -1;
                         }
                         
-                        if (available_row == available_row_2 && available_col == available_col_2) 
+                        if ( available_row == avai_row_check && available_col == avai_col_check )
                         {
                             double_checked = 1;
-                            if (DEBUG)
+                            if ( DEBUG )
                             {
-                                printf("wr row:%d, col:%d, req_num:%d, agent_id:%d, req_id:%d \n\n", available_row, available_col, request, id, i);
+                                printf( "wr row:%d, col:%d, req_num:%d, agent_id:%d, req_id:%d \n\n", available_row, available_col, request, id, req_index );
                             }
-                            reserve( i, available_row, available_col, id);
-                            if (DEBUG)
-                            {
-                                print_table(t->table);  
-                            }
+                            reserve( req_index, available_row, available_col, id );
+                            if ( DEBUG )
+                                print_table( t->table );
                         }else{
                         	double_checked = 0;
                         }
-                        sem_post(&writer_sem);    
+                        sem_post( &writer_sem );
                     }
                 }
             }
         }
     }
-    // Don't forget the gettimeofday() call when you add another return statement
     gettimeofday((t->end_time)+id, NULL);
     return -1;
 }
 
-// Recommendation for first-fit:
-// This function returns -1 if there are not enough consecutive seats
-// Return the starting column id if there are enough seats
 
-// You may declare other functions for best-fit and bonus:
-
+//supplement function for first fit
 int row_check(int row, int seats){
     int count = 0;
     int i;
-
+    
     for(i=0; i<COL; i++){
         if(t->table[row][i] == 0){
             count++;
@@ -223,56 +210,13 @@ int row_check(int row, int seats){
         else
             count = 0;
     }
-
+    
     return -1;
 }
 
-void best_fit( int seats, int * row, int * col ){
-    int best_row = -1; 
-    int best_col = -1; 
-    int min_dis = COL+1;
-    int dis;
-    int count = 0;
-    int i = 0;
-
-    for (i = 0; i < ROW; ++i)
-    {
-        for (int j = 0; j < COL; ++j)
-        {
-            if (t->table[i][j] == 0)
-            {
-                count ++;
-            }else{
-                dis = count - seats;
-                if (dis >= 0 && dis < min_dis)
-                {
-                    min_dis = dis; 
-                    best_row = i;
-                    best_col = j - count;
-                }
-                count = 0;
-            }
-        }
-        dis = count - seats;
-        if (dis >= 0 && dis < min_dis )
-        {
-            min_dis = dis;
-            best_row = i; 
-            best_col = COL - min_dis - seats;
-        }
-        count = 0;
-    }
-    
-    if (best_row == -1 )
-    {
-        *row = -1; *col = -1;
-    }else{
-        *row = best_row; *col = best_col;
-    }
-}
-
+//first fit function
 void first_fit( int seats, int * row, int * col){
-    int row_i = 0;   
+    int row_i = 0;
     do{
         *col = row_check(row_i, seats);
         if( *col != -1 ){
@@ -283,64 +227,109 @@ void first_fit( int seats, int * row, int * col){
     }while( row_i < ROW );
 }
 
-void advance_fit( int seats, int * row, int * col ){
-    int best_row = -1; 
-    int best_col = -1; 
-    int min_dis = COL+1;
+//best fit function
+void best_fit( int seats, int * row, int * col ){
+    int best_fit_row = -1; 
+    int best_fit_col = -1; 
+    int smallest_dis = COL+1;
     int dis;
     int count = 0;
-    int i = 0;
+    int row_i = 0;
 
-
-    for (i = 0; i < ROW; ++i)
-    {   
-        //unlock sem 
-        sem_wait(&reader_sem_arr[i]);
-        t->reader_counts[i] += 1;
-        if ( t->reader_counts[i] == 1)
+    for ( row_i = 0; row_i < ROW; ++row_i )
+    {
+        for ( int col_j = 0; col_j < COL; ++col_j )
         {
-        	sem_wait(&writer_sem_arr[i]);
-        }
-        sem_post(&reader_sem_arr[i]);
-
-        for (int j = 0; j < COL; ++j)
-        {
-            if (t->table[i][j] == 0)
+            if ( t->table[row_i][col_j] == 0 )
             {
                 count ++;
             }else{
                 dis = count - seats;
-                if (dis >= 0 && dis < min_dis)
+                if ( dis >= 0 && dis < smallest_dis )
                 {
-                    min_dis = dis; 
-                    best_row = i;
-                    best_col = j - count;
+                    smallest_dis = dis; 
+                    best_fit_row = row_i;
+                    best_fit_col = col_j - count;
                 }
                 count = 0;
             }
         }
         dis = count - seats;
-        if (dis >= 0 && dis < min_dis )
+        if ( dis >= 0 && dis < smallest_dis )
         {
-            min_dis = dis;
-            best_row = i; 
-            best_col = COL - min_dis - seats;
+            smallest_dis = dis;
+            best_fit_row = row_i;
+            best_fit_col = COL - smallest_dis - seats;
         }
         count = 0;
-
-        sem_wait(&reader_sem_arr[i]);
-        t->reader_counts[i]--;
-        if (t->reader_counts[i] == 0)
-        {
-            sem_post(&writer_sem_arr[i]);
-        }
-        sem_post(&reader_sem_arr[i]);
     }
     
-    if (best_row == -1 )
+    if ( best_fit_row == -1 )
     {
         *row = -1; *col = -1;
     }else{
-        *row = best_row; *col = best_col;
+        *row = best_fit_row; *col = best_fit_col;
+    }
+}
+
+void advance_fit( int seats, int * row, int * col ){
+    int best_fit_row = -1; 
+    int best_fit_col = -1; 
+    int smallest_dis = COL+1;
+    int dis;
+    int count = 0;
+    int row_i = 0;
+
+
+    for (row_i = 0; row_i < ROW; ++row_i)
+    {   
+        //unlock sem 
+        sem_wait( &reader_sem_arr[row_i] );
+        t->reader_counts[row_i] += 1;
+        if ( t->reader_counts[row_i] == 1 )
+        {
+        	sem_wait( &writer_sem_arr[row_i] );
+        }
+        sem_post( &reader_sem_arr[row_i] );
+
+        for ( int col_j = 0; col_j < COL; ++col_j )
+        {
+            if ( t->table[row_i][col_j] == 0 )
+            {
+                count ++;
+            }else{
+                dis = count - seats;
+                if ( dis >= 0 && dis < smallest_dis )
+                {
+                    smallest_dis = dis; 
+                    best_fit_row = row_i;
+                    best_fit_col = col_j - count;
+                }
+                count = 0;
+            }
+        }
+        dis = count - seats;
+        if ( dis >= 0 && dis < smallest_dis )
+        {
+            smallest_dis = dis;
+            best_fit_row = row_i;
+            best_fit_col = COL - smallest_dis - seats;
+        }
+        count = 0;
+
+        sem_wait( &reader_sem_arr[row_i] );
+        t->reader_counts[row_i] -- ;
+        if ( t->reader_counts[row_i] == 0 )
+        {
+            sem_post( &writer_sem_arr[row_i] );
+        }
+        sem_post( &reader_sem_arr[row_i] );
+    }
+    
+    if ( best_fit_row == -1 )
+    {
+        *row = -1; *col = -1;
+    }else{
+        *row = best_fit_row; *col = best_fit_col;
     }
 }

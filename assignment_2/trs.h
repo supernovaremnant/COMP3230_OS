@@ -1,5 +1,5 @@
-#define ROW 128			// number of rows
-#define COL 128			// number of columns
+#define ROW 128		// number of rows
+#define COL 128		// number of columns
 #define MIN_SEAT_REQ 1		// min. no. of seats to be reserved in a request
 #define MAX_SEAT_REQ 20		// max. no. of seats to be reserved in a request
 #define WITHDRAW 3		// one withdrawal in every WITHDRAW reqs

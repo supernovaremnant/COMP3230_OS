@@ -15,6 +15,11 @@ sem_t reader_sem;				// semaphore for reading
 sem_t writer_sem;				// semaphore for writing
 int mode;
 
+/*my code for bonus is added here*/
+sem_t reader_sem_arr[ROW];
+sem_t writer_sem_arr[ROW];
+
+
 void *agent(void *);
 
 void reserve(int req_id, int row, int col, int agent_id)  {
@@ -137,14 +142,22 @@ int main(int argc, char **argv) {
 	exit(0);
    }
 
-   if (mode != 0 && mode != 1) {
-	printf("\"mode\" must be either 0 or 1\n");
+   if (mode != 0 && mode != 1 && mode != 2) {
+	printf("\"mode\" must be either 0 or 1 or 2\n");
 	exit(0);
    }
 
    // init the value of semaphores
    sem_init(&reader_sem, 0, 1);
    sem_init(&writer_sem, 0, 1);
+
+   int sem_count;
+   for (sem_count = 0; sem_count < ROW; sem_count++)
+   {
+   	sem_init(&reader_sem_arr[sem_count], 0, 1);
+   	sem_init(&writer_sem_arr[sem_count], 0, 1);
+   }
+
 
    //set agent ids (0 to AGENT_NO-1)
    for (i=0; i<AGENT_NO; i++)
@@ -205,6 +218,6 @@ int main(int argc, char **argv) {
        sec = (float)usec / (float)1000000;
 	   printf("Agent%d %d %.4f\n", i, t->seats[i], sec);
    }
-   //print_table(t->table);
+
    return 0;
 }

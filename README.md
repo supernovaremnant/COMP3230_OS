@@ -1,6 +1,3 @@
-##COMP3230
-hku operating system courses
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -35,6 +32,9 @@ A:active  { color : #000000; font-weight: normal; background-color : transparent
 ├── <a href="./README.md">README.md</a><br>
 ├── <a href="./assignment_1/">assignment_1</a><br>
 │   ├── <a href="./assignment_1/3035124881.docx">3035124881.docx</a><br>
+│   ├── <a href="./assignment_1/SampleSol/">SampleSol</a><br>
+│   │   ├── <a href="./assignment_1/SampleSol/Solution%20of%20A1.pdf">Solution of A1.pdf</a><br>
+│   │   └── <a href="./assignment_1/SampleSol/tmem_sample.c">tmem_sample.c</a><br>
 │   ├── <a href="./assignment_1/driveGnuPlots.pl">driveGnuPlots.pl</a><br>
 │   ├── <a href="./assignment_1/malloc">malloc</a><br>
 │   ├── <a href="./assignment_1/malloc.c">malloc.c</a><br>
@@ -49,6 +49,11 @@ A:active  { color : #000000; font-weight: normal; background-color : transparent
 │   └── <a href="./assignment_1/tmem_template.c">tmem_template.c</a><br>
 ├── <a href="./assignment_2/">assignment_2</a><br>
 │   ├── <a href="./assignment_2/Makefile">Makefile</a><br>
+│   ├── <a href="./assignment_2/SampleSol/">SampleSol</a><br>
+│   │   ├── <a href="./assignment_2/SampleSol/Solution%20of%20A2.pdf">Solution of A2.pdf</a><br>
+│   │   ├── <a href="./assignment_2/SampleSol/agent_basic.c">agent_basic.c</a><br>
+│   │   ├── <a href="./assignment_2/SampleSol/agent_bonus.c">agent_bonus.c</a><br>
+│   │   └── <a href="./assignment_2/SampleSol/trs_bonus.c">trs_bonus.c</a><br>
 │   ├── <a href="./assignment_2/Screenshot%20from%202016-11-29%2010-49-41.png">Screenshot from 2016-11-29 10-49-41.png</a><br>
 │   ├── <a href="./assignment_2/agent.c">agent.c</a><br>
 │   ├── <a href="./assignment_2/hw02.docx">hw02.docx</a><br>
@@ -71,7 +76,7 @@ A:active  { color : #000000; font-weight: normal; background-color : transparent
 </p>
 <p>
 
-3 directories, 32 files
+5 directories, 38 files
 <br><br>
 </p>
 <hr>
